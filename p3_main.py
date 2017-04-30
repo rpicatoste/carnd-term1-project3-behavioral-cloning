@@ -1,6 +1,6 @@
 
 # TODO: Generate data recording driving.
-epochs = 3
+epochs = 6
 
 
 #%% Get data
@@ -160,24 +160,24 @@ model.add( Cropping2D(cropping=((50,20), (0,0)), input_shape=(160,320,3)) )
 model.add(Lambda(lambda x: x / 127.5 - 1.0))
 
 # convolutional and maxpooling layers
-model.add(Convolution2D(24, 5, 5, border_mode='valid', subsample=(2, 2), init='he_normal'))
+model.add(Convolution2D(24, 5, 5, border_mode='valid', subsample=(2, 2), activation='relu'))
 model.add(PReLU())
 model.add(BatchNormalization())
 
-model.add(Convolution2D(36, 5, 5, border_mode='valid', subsample=(2, 2), init='he_normal'))
+model.add(Convolution2D(36, 5, 5, border_mode='valid', subsample=(2, 2), activation='relu'))
 model.add(PReLU())
 model.add(BatchNormalization())
 
-model.add(Convolution2D(48, 5, 5, border_mode='valid', subsample=(2, 2), init='he_normal'))
+model.add(Convolution2D(48, 5, 5, border_mode='valid', subsample=(2, 2), activation='relu'))
 model.add(PReLU())
 model.add(BatchNormalization())
 
-model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1), init='he_normal'))
+model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1), activation='relu'))
 model.add(PReLU())
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1), init='he_normal'))
+model.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1)))
 model.add(PReLU())
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
@@ -185,25 +185,23 @@ model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 model.add(Flatten())
 
 # fully connected layers 1164
-model.add(Dense(100, init='he_normal'))
+model.add(Dense(100, activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.5))
+
+model.add(Dense(100))
 model.add(PReLU())
 model.add(BatchNormalization())
-model.add(Dropout(0.8))
+model.add(Dropout(0.5))
 
-model.add(Dense(100, init='he_normal'))
-model.add(PReLU())
-model.add(BatchNormalization())
-model.add(Dropout(0.8))
-
-model.add(Dense(50, init='he_normal'))
-model.add(PReLU())
+model.add(Dense(50))
+model.add(Dropout(0.5))
 model.add(BatchNormalization())
 
-model.add(Dense(10, init='he_normal'))
-model.add(PReLU())
+model.add(Dense(10))
 model.add(BatchNormalization())
 
-model.add(Dense(1, activation='tanh'))
+model.add(Dense(1, activation='tanh')) # Tanh limits the output between -1 and 1
 
 
 #inp = Input(shape = (160,320,3))
