@@ -2,6 +2,19 @@
 
 #%%
 if 0:
+    #%%
+#    plt.figure()
+#    plt.plot(bins)
+
+    for ii in np.random.randint(0,len(images),10):
+        plt.figure()
+        plt.imshow(X_train[ii])
+        plt.title('Image:'+str(ii)+' - steering: '+str(y_train[ii]))
+        plt.show()
+        
+        
+#%%
+if 0:
     #%% What the network can see.
     X_to_plot = X_train[0:1,:,:,:]
     
