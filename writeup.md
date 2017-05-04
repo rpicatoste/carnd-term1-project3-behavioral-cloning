@@ -114,65 +114,38 @@ In the next section the steps followed are explained.
 
 To get the model architecture I started by using the simple networks used by Daniel in the lesson of the course corresponding to this project. It seemed to somehow train and then try to steer the car, but the result was not good. After that I started trying to improve the network by increasing complexity, but the losses did not seem to decrease as expected. With losses achieved at this point, the car was not able to start the circuit.
 
-Then I decided to try the referenced NVIDIA network. At the beginning I did not consider it because I assumed that being a network that has driven a real car, it would be way more complex that what is really needed in this project. But I found that several people had used and recommended using it, and claiming that it was not that hard to train. I tried it, but again the result was not good. 
+Then I decided to try the referenced NVIDIA network. At the beginning I did not consider it because I assumed that being a network that has driven a real car, it would be way more complex that what is really needed in this project. But I found that several people had used and recommended using it, and claiming that it was not that hard to train. I tried it, but again the result was not good. At this point I looked for implementations of the same network from other people, and found some interesting ones in github, but after trying them in my code, the situation was the same.
 
-So far I had been using only the dataset 
+So far I had been using only the dataset from the samples, and after reading multiple posts in the forum advising about this project, it became clear that the data should be improved. I recorded myself doing the circuit forward and backward, and also going to the sides in order to record the recoveries from the sides. After doing this, the situation did not improve at all. A bit in despair I produced the bits of code in utils.py in order to understand if the cropping and normalizing was properly done:
 
+![alt text](./images/example_input_image_inside_nn.png "Visualization")
 
+The image seems correctly pre-processed. Another advice I found was to equalize the samples per steering angle. After seeing that I plot the histogram of steering angles:
+  
+![alt text](./images/histogram_initial.png "Visualization")
 
-filter by angle, eliminate the 0 angle
-desperate i did the tool to see the view of the network
-First layer reduced to 100 
-tanh output 
+It is clear that there is an excess of angles being 0 or very close. I removed enough to get a more equalized data set:
 
- 
+![alt text](./images/histogram_removing_zeros.png "Visualization")
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+Once training with this, the car started to behave better, but not yet doing much of the circuit. The next step was to augment data to help the network going far from the sides. For this I used, as suggested in the course, the lateral cameras with some fictional angle added to "come back" from the sides. After some tuning of this parameter, I got the car doing a full lap. 
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+To improve the behavior, I tried different numbers of epochs, since again in the forum I found that this system is particularly sensitive to many epochs. I found that 9 epochs yielded a smooth behavior in the track.  
 
-To combat the overfitting, I modified the model so that ...
+A very important part of the final network has been the use of the hyperbolic tangent at the output. My interpretation of this is that such activation limits the control action (the steering angle applied), smoothing the output applied to the car. With it, and the datasets, epochs and so on found in the code, the car can finish the laps with a nice behavior. If only that activation is removed and the same training performed, the car will do part of the track, but far from a complete lap.
 
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+Finally I also reduced the first fully connected layer of the NVIDIA architecture (the one in which the final version is based) from 1164 neurons to 100. I did this because the original size of the network is meant for a real car dealing with many more data and situations, and in this project it would lead only to overfit.
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
+The final architecture is the one presented already, and in the previous point the steps followed to arrive to it are commented.
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+In the point 1 of this section I explained how the data was found to be crucial in obtaining a good behavior of the car. 
 
-![alt text][image2]
+The data used have been the sample data from udacity, and 2 laps recorded by me (one on each direction) and some recordings of recoveries. 
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+The augmentation have been, for the samples with steering angles near zero, to use the side cameras adding a fictitious angle to come back to the center of the road. And for the samples with steering angle above a threshold, to flip them. 
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text](./images/soft_turn_right.png "Visualization")
-
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
-
-
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
-
-![alt text](./images/example_input_image_inside_nn.png "Visualization")
+One model have been trained with only the sample data from udacity, applying the mentioned augmentation. In this way the best result was obtained, presented in the video submitted with this project. The system has also been trained with all the datasets explained, obtaining also good results with a car that can do the full lap. Both sets of weights ares submitted. 
