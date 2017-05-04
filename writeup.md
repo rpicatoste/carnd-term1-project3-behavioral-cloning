@@ -40,13 +40,16 @@ My project includes the following files:
 
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track.
 
-I generated 2 differentiated sets of weights. Both have the same network, but for the training, I got a set of weights training with the example data provided by udacity, and another one with data recorded by me.
+I generated 2 differentiated sets of weights. Both have the same network architecture, but for the training, I got a set of weights training with the example data provided by udacity, and another one with data recorded by me.
 
+To run the model trained with the sample data, use the line:
 
- 
-```
-python drive.py model.h5
-```
+    python drive.py model_ud_data.h5
+
+And to run the model trained also with the data recorded by me, use the line: 
+
+    python drive.py model_my_data.h5
+
 
 ####3. Submission code is usable and readable
 
@@ -57,32 +60,72 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+My model consists of a convolution neural network with the following layers:
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+* A cropping layer, to remove the non-interesting parts of the image, like the car's hood, and the distracting parts for the neural network, like those above the road. In the utils.py, there is a code cell which will show what can be seen by the network after this layer and also after the next one.
+
+* A Lambda layer for normalization of the input image.  
+
+* A convolution layer with a 5x5 filter, stride of 2 and a depth of 24 layers. The activation at the output is ReLU.
+
+* A convolution layer with a 5x5 filter, stride of 2 and a depth of 36 layers. The activation at the output is ReLU.
+
+* A convolution layer with a 5x5 filter, stride of 2 and a depth of 48 layers. The activation at the output is ReLU.
+
+* A convolution layer with a 3x3 filter, stride of 1 and a depth of 64 layers. The activation at the output is ReLU.
+
+* A convolution layer with a 3x3 filter, stride of 1 and a depth of 64 layers. The activation at the output is ReLU.
+
+* A flatten layer, to start with the fully connected layers.
+
+* A fully connected layer with 100 nodes and ReLU activation.
+ 
+* Immediately after there is a batch normalization layer, to help the training to converge faster, and a dropout layer, to help the network to generalize.
+
+* A fully connected layers with 100 nodes, and again batch normalization and dropout after.
+
+* A fully connected layers with 50 nodes, and again batch normalization and dropout after.
+
+* A fully connected layers with 10 nodes and batch normalization after.
+
+* Finally the output layer with 1 node, and activation function hyperbolic tangent.
+
+
+
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
-
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+In the network, the means to reduce overfitting has been to use dropout. In addition to this, the way to avoid overfitting has been on the dataset selection, which will be explained in its own point below.  
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually.
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+Training data has been the hardest part. Actually, realizing that it was the data and not the network the reason for not obtaining a good result, was the hard part.
 
-For details about how I created the training data, see the next section. 
+In the next section the steps followed are explained.  
 
 ---
 ###Model Architecture and Training Strategy
 
 ####1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+To get the model architecture I started by using the simple networks used by Daniel in the lesson of the course corresponding to this project. It seemed to somehow train and then try to steer the car, but the result was not good. After that I started trying to improve the network by increasing complexity, but the losses did not seem to decrease as expected. With losses achieved at this point, the car was not able to start the circuit.
+
+Then I decided to try the referenced NVIDIA network. At the beginning I did not consider it because I assumed that being a network that has driven a real car, it would be way more complex that what is really needed in this project. But I found that several people had used and recommended using it, and claiming that it was not that hard to train. I tried it, but again the result was not good. 
+
+So far I had been using only the dataset 
+
+
+
+filter by angle, eliminate the 0 angle
+desperate i did the tool to see the view of the network
+First layer reduced to 100 
+tanh output 
+
+ 
 
 My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
 
@@ -120,8 +163,8 @@ Then I repeated this process on track two in order to get more data points.
 
 To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
 
-![alt text][image6]
-![alt text][image7]
+![alt text](./images/soft_turn_right.png "Visualization")
+
 
 Etc ....
 
@@ -131,3 +174,5 @@ After the collection process, I had X number of data points. I then preprocessed
 I finally randomly shuffled the data set and put Y% of the data into a validation set. 
 
 I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+![alt text](./images/example_input_image_inside_nn.png "Visualization")
