@@ -31,6 +31,7 @@ My project includes the following files:
 
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
+* utils.py with some pieces of code that I used to generate some plots helping to understand the newtork while creating and training it. 
 * model\_ud_data.h5 containing a convolution neural network, trained using the udacity data. 
 * model\_my_data.h5 containing a convolution neural network, trained using the udacity data and, in addition, one dataset recorded by me doing the circuit 1 in one direction, another doing it in the reversed direction, and a third one recording recoveries from the side of the road. 
 * writeup.md (this file) summarizing the results
