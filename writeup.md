@@ -4,7 +4,6 @@
 
 
 
-
 ##Writeup 
 
 **Behavioral Cloning Project**
@@ -12,7 +11,7 @@
 The goals / steps of this project are the following:
 
 * Use the simulator to collect data of good driving behavior
-* Build, a convolution neural network in Keras that predicts steering angles from images
+* Build a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
@@ -29,12 +28,13 @@ Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/4
 
 My project includes the following files:
 
-* model.py containing the script to create and train the model
-* drive.py for driving the car in autonomous mode
-* utils.py with some pieces of code that I used to generate some plots helping to understand the newtork while creating and training it. 
-* model\_ud_data.h5 containing a convolution neural network, trained using the udacity data. 
-* model\_my_data.h5 containing a convolution neural network, trained using the udacity data and, in addition, one dataset recorded by me doing the circuit 1 in one direction, another doing it in the reversed direction, and a third one recording recoveries from the side of the road. 
-* writeup.md (this file) summarizing the results
+* model.py - Containing the script to create and train the model
+* drive.py - For driving the car in autonomous mode
+* utils.py - With some pieces of code that I used to generate some plots helping to understand the newtork while creating and training it. 
+* model\_ud_data.h5 - Containing a convolution neural network, trained using the udacity data. 
+* model\_my_data.h5 - Containing a convolution neural network, trained using the udacity data and, in addition, one dataset recorded by me doing the circuit 1 in one direction, another doing it in the reversed direction, and a third one recording recoveries from the side of the road. 
+* demorun.mp4 - A video of the car doing a full lap in autonomous mode.
+* writeup.md (this file) - Summarizing the results
 
 ####2. Submission includes functional code
 
@@ -114,13 +114,13 @@ In the next section the steps followed are explained.
 
 To get the model architecture I started by using the simple networks used by Daniel in the lesson of the course corresponding to this project. It seemed to somehow train and then try to steer the car, but the result was not good. After that I started trying to improve the network by increasing complexity, but the losses did not seem to decrease as expected. With losses achieved at this point, the car was not able to start the circuit.
 
-Then I decided to try the referenced NVIDIA network. At the beginning I did not consider it because I assumed that being a network that has driven a real car, it would be way more complex that what is really needed in this project. But I found that several people had used and recommended using it, and claiming that it was not that hard to train. I tried it, but again the result was not good. At this point I looked for implementations of the same network from other people, and found some interesting ones in github, but after trying them in my code, the situation was the same.
+Then I decided to try the referenced NVIDIA network. At the beginning I did not consider it because I assumed that being a network that has driven a real car, it would be way more complex than what is really needed in this project. But I found that several people had used and recommended using it, claiming that it was not that hard to train. I tried it, but again the result was not good. At this point I looked for implementations of the same network from other people, and found some interesting ones in github, but after trying them in my code, the situation was the same.
 
-So far I had been using only the dataset from the samples, and after reading multiple posts in the forum advising about this project, it became clear that the data should be improved. I recorded myself doing the circuit forward and backward, and also going to the sides in order to record the recoveries from the sides. After doing this, the situation did not improve at all. A bit in despair I produced the bits of code in utils.py in order to understand if the cropping and normalizing was properly done:
+So far I had been using only the dataset from the samples, and after reading multiple posts in the forum advising about this project, it became clear that the data should be improved. I recorded myself doing the circuit forward and backward, and also going to the sides in order to record the recoveries from the sides. I did it with an analog joystick to have smooth angles. After doing this, the situation did not improve at all. A bit in despair I produced the bits of code in utils.py in order to understand if the cropping and normalizing was properly done:
 
 ![alt text](./images/example_input_image_inside_nn.png "Visualization")
 
-The image seems correctly pre-processed. Another advice I found was to equalize the samples per steering angle. After seeing that I plot the histogram of steering angles:
+The image seems correctly pre-processed. Another advice I found was to equalize the samples per steering angle. After seeing that, I plotted the histogram of steering angles:
   
 ![alt text](./images/histogram_initial.png "Visualization")
 
@@ -128,9 +128,9 @@ It is clear that there is an excess of angles being 0 or very close. I removed e
 
 ![alt text](./images/histogram_removing_zeros.png "Visualization")
 
-Once training with this, the car started to behave better, but not yet doing much of the circuit. The next step was to augment data to help the network going far from the sides. For this I used, as suggested in the course, the lateral cameras with some fictional angle added to "come back" from the sides. After some tuning of this parameter, I got the car doing a full lap. 
+Once training with this, the car started to behave better, but not yet doing most of the circuit. The next step was to augment data to help the network going far from the sides. For this I used, as suggested in the course, the lateral cameras with some fictional angle added to "come back" from the sides. After some tuning of this parameter, I got the car doing a full lap. 
 
-To improve the behavior, I tried different numbers of epochs, since again in the forum I found that this system is particularly sensitive to many epochs. I found that 9 epochs yielded a smooth behavior in the track.  
+To improve the behavior, I tried different numbers of epochs, since again in the forum I found that this system is particularly sensitive to too many epochs. I found that 9 epochs yielded a smooth behavior in the track.  
 
 A very important part of the final network has been the use of the hyperbolic tangent at the output. My interpretation of this is that such activation limits the control action (the steering angle applied), smoothing the output applied to the car. With it, and the datasets, epochs and so on found in the code, the car can finish the laps with a nice behavior. If only that activation is removed and the same training performed, the car will do part of the track, but far from a complete lap.
 
@@ -148,4 +148,4 @@ The data used have been the sample data from udacity, and 2 laps recorded by me 
 
 The augmentation have been, for the samples with steering angles near zero, to use the side cameras adding a fictitious angle to come back to the center of the road. And for the samples with steering angle above a threshold, to flip them. 
 
-One model have been trained with only the sample data from udacity, applying the mentioned augmentation. In this way the best result was obtained, presented in the video submitted with this project. The system has also been trained with all the datasets explained, obtaining also good results with a car that can do the full lap. Both sets of weights ares submitted. 
+One model have been trained with only the sample data from udacity, applying the mentioned augmentation. In this way the best result was obtained, presented in the video submitted with this project. The system has also been trained with all the datasets explained, obtaining also good results with a car that can do the full lap. Both sets of weights are submitted. 
